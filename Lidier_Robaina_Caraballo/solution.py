@@ -1,14 +1,9 @@
+from player import Player
+from board import HexBoard
+
 import random
 from copy import deepcopy
 from math import inf
-
-
-class Player:
-    def __init__(self, player_id: int):
-        self.player_id = player_id  # Tu identificador (1 o 2)
-
-    def play(self, board: HexBoard) -> tuple:
-        raise NotImplementedError("¡Implementa este método!")
 
 
 class HexDisjointSet:
@@ -108,30 +103,23 @@ class HexDisjointSet:
         self.ds[a] = b
         return True  
 
-    
 
-class RandomPlayer(Player):
+
+
+class SmartPlayer(Player):
     def play(self, board: HexBoard) -> tuple:
-        return random.choice(board.get_possible_moves())
-        
-        
-class HeuristicAlphaBetaPlayer(Player):
-    def __init__(self, player_id: int, cutoff, h):
-        super().__init__(player_id)
-        self.cutoff = cutoff
-        self.h = h
-
-    def play(self, board: HexBoard) -> tuple:
-
         player = self.player_id
         opponent = 3 - player
-        board = HexDisjointSet(board.board)
+        ds: HexDisjointSet = HexDisjointSet(board.board)
 
-        def max_value(board: HexBoard, alpha, beta, depth):
+        cutoff = three_depth_cutoff
+        h = evaluate
+
+        def max_value(board: HexDisjointSet, alpha, beta, depth):
             if board.check_connection(opponent):
-                return -1, None  
-            if self.cutoff(board, depth):
-                return self.h(board, player), None
+                return -inf, None
+            if cutoff(board, depth):
+                return h(board, player), None
 
             value, move = -inf, None
             for row,col in board.get_possible_moves():
@@ -145,11 +133,11 @@ class HeuristicAlphaBetaPlayer(Player):
                     return value, move
             return value, move
 
-        def min_value(board: HexBoard, alpha, beta, depth):
+        def min_value(board: HexDisjointSet, alpha, beta, depth):
             if board.check_connection(player):
-                return 1, None     
-            if self.cutoff(board, depth):
-                return self.h(board, player), None       
+                return +inf, None
+            if cutoff(board, depth):
+                return h(board, player), None       
             value, move = +inf, None
             for row,col in board.get_possible_moves():
                 new_board = board.clone()
@@ -162,12 +150,18 @@ class HeuristicAlphaBetaPlayer(Player):
                     return value, move
             return value, move
 
-        value, move = max_value(board, -inf, +inf, 0)
+        value, move = max_value(ds, -inf, +inf, 0)
         return move
+    
+    
 
+class RandomPlayer(Player):
+    def play(self, board: HexBoard) -> tuple:
+        return random.choice(board.get_possible_moves())
+        
 
 def three_depth_cutoff(board, depth):
-    return depth == 2   
+    return depth == 2
 
  
 
@@ -176,7 +170,7 @@ def evaluate(board, player):
     player_moves = min_plays_to_win(board, player)
     opponent_moves = min_plays_to_win(board, 3-player)
     
-    return opponent_moves - player_moves
+    return opponent_moves - 2 * player_moves
 
 
 from heapq import heappush, heappop
@@ -216,4 +210,9 @@ def min_plays_to_win(board, player):
                 dist[ni][nj] = new_cost
                 heappush(heap, (new_cost, ni, nj))
     
-    return float('inf')  # Si no hay camino
+    return inf  # Si no hay camino
+
+
+
+
+        

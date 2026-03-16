@@ -1,4 +1,7 @@
-biblio/
+Lidier_Robaina_Caraballo/board.py
+Lidier_Robaina_Caraballo/player.py
+Lidier_Robaina_Caraballo/test.ipynb
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
