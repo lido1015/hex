@@ -1,60 +1,54 @@
-# AI para Hex con Conjuntos Disjuntos y Heurística de Evaluación
+# IA para Hex: Implementación con MiniMax y Heurística de Dijkstra
 
-## Introducción  
-Este repositorio implementa una IA para el juego de Hex utilizando el algoritmo **Alpha-Beta** con poda, mejorado con una heurística personalizada. El código destaca por el uso de:  
-- **Estructura de Conjuntos Disjuntos (Union-Find)** para verificar conectividad eficiente.  
-- **Heurística basada en Dijkstra** para evaluar estados del tablero.  
+## Descripción
 
----
+Este proyecto implementa un agente inteligente para el juego de Hex utilizando algoritmos de búsqueda adversarial con poda Alpha-Beta, optimizado mediante una estructura de datos Union-Find para verificación de conectividad y una función heurística basada en el algoritmo de Dijkstra para evaluación de estados. El sistema está diseñado para tableros de tamaño variable, con estrategias adaptativas de profundidad de búsqueda para mantener tiempos de respuesta razonables.
 
-## Componentes Clave
+## Componentes Principales
 
-### HexDisjointSet: Conjuntos Disjuntos para Conectividad
+### 1. HexDisjointSet
+Implementación de Union-Find para detección eficiente de conexiones:
+- **Nodos Virtuales**: 4 nodos adicionales para representar bordes del tablero
+  - Nodo 0: Borde izquierdo (Jugador 1)
+  - Nodo 1: Borde derecho (Jugador 1)
+  - Nodo 2: Borde superior (Jugador 2)
+  - Nodo 3: Borde inferior (Jugador 2)
+- Las operaciones de unión y búsqueda se optimizan con compresión de camino y unión por rango, permitiendo verificaciones de conectividad en tiempo casi constante.
 
-- **Seguimiento eficiente de conexiones**:  
-  Estructura Union-Find que agrupa dinámicamente celdas en componentes conectados.
-- **Nodos virtuales para bordes**:
-  - Jugador 1 (🔴): Usa nodos `0` (izquierdo) y `1` (derecho).
-  - Jugador 2 (🔵): Usa nodos `2` (superior) y `3` (inferior).
-- **Actualización automática**: Al colocar una ficha, une celdas adyacentes y bordes relevantes.
-- **Verificación de victoria en O(1)**:  
-  Comprueba si los bordes virtuales están conectados (Ej: `_root(0) == _root(1)` para Jugador 1).
 
-### 2. Función de Evaluación Heurística  
-- **Objetivo**: Estimar movimientos mínimos necesarios para conectar los bordes.  
-- **Algoritmo**:  
-  - **Dijkstra Modificado**:  
-    - Prioriza celdas ocupadas por el jugador (costo `0`) o vacías (costo `+1`).  
-    - Calcula la ruta más corta (en movimientos) para conectar los bordes.  
-  - **Puntuación**:  
-    - `puntuación = movimientos_oponente - movimientos_jugador`  
-    - Valores altos indican ventaja para la IA.  
+### 2. SmartPlayer
+Agente IA que implementa búsqueda minimax con poda Alpha-Beta:
+- **Profundidad Adaptativa**: Ajusta la profundidad máxima según tamaño del tablero, movimientos restantes y tiempo disponible
+- **Control de Tiempo**: Monitoreo continuo durante la búsqueda para evitar timeouts (límite de 4.8 segundos por movimiento)
 
----
+## Algoritmos Implementados
 
-## Notas de Uso  
-- **Compatibilidad con HexBoard**:  
-  - El código asume una clase `HexBoard` con métodos como `place_piece`, `get_possible_moves` y `check_connection`.  
-  - Se incluye una implementación básica, pero puede reemplazarse con cualquier otra.  
-- **Configuración de la IA**:  
-  - Profundidad de búsqueda fija (`cutoff=2`). Ajustar para equilibrio velocidad/eficacia.  
-  - La heurística es eficiente y evita exploraciones exhaustivas del tablero.  
+### 1. Búsqueda Alpha-Beta
+Implementación del algoritmo minimax con poda para reducir el espacio de búsqueda:
+- Explora el árbol de juego de manera eficiente, podando ramas que no afectan la decisión óptima
+- Utiliza valores α y β para mantener cotas superior e inferior del valor del nodo
 
----
+### 2. Heurística de Evaluación
+Función heurística basada en distancia mínima a la victoria:
+- Calcula movimientos mínimos necesarios para que cada jugador conecte sus bordes
+- Puntuación: diferencia entre movimientos del oponente y del jugador
+- Valores positivos favorecen al jugador evaluado
 
-## Detalles Técnicos  
-- **Optimizaciones en Conjuntos Disjuntos**:  
-  - *Compresión de camino* y *unión por rango* para operaciones en tiempo casi constante.  
-- **Eficiencia de la Heurística**:  
-  - Dijkstra prioriza caminos prometedores, reduciendo costos computacionales.  
+### 3. Dijkstra Modificado para Distancia Mínima
+Adaptación del algoritmo de Dijkstra para calcular caminos óptimos en el tablero:
+- Asigna costos a celdas: 0 para celdas propias, 1 para vacías, infinito para oponentes
+- Encuentra el camino de menor costo desde un borde inicial hasta el borde opuesto
 
----
+### 4. Función de Corte Adaptativo
+La función cutoff ajusta dinámicamente la profundidad máxima de búsqueda basándose en:
+- Tamaño del tablero (más profundidad para tableros pequeños)
+- Proporción de movimientos restantes (más profundidad en fases finales)
+- Restricciones de tiempo para asegurar respuestas oportunas
 
-## Dependencias  
-- Python 3.10+  
-- `copy` (para clonar tableros).  
-- `heapq` (para la cola de prioridad en la heurística).  
 
----
+
+
+
+
 
 
