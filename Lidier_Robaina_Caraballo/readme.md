@@ -1,4 +1,4 @@
-# IA para Hex: Implementación con MiniMax y Heurística de Dijkstra
+# IA para Hex: Implementación con MiniMax
 
 ## Descripción
 
