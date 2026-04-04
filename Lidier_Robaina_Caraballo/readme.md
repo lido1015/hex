@@ -7,7 +7,7 @@ Este proyecto implementa un agente inteligente para el juego de Hex utilizando a
 ## Componentes Principales
 
 ### 1. HexDisjointSet
-Implementación de Union-Find para detección eficiente de conexiones:
+Implementación de Disjoint Sets para detección eficiente de conexiones:
 - **Nodos Virtuales**: 4 nodos adicionales para representar bordes del tablero
   - Nodo 0: Borde izquierdo (Jugador 1)
   - Nodo 1: Borde derecho (Jugador 1)
